@@ -17,4 +17,12 @@ internal static class Formatter {
 
         return output;
     }
+
+    public static string FormatString(string str, int maxWidth, int addtionalSpace = 0) {
+        maxWidth = Math.Max(4, maxWidth);
+
+        return str.Length > maxWidth ?
+            string.Concat(str[0..(maxWidth - 3)], "...", new string(' ', addtionalSpace)) :
+            str.PadRight(maxWidth + addtionalSpace);
+    }
 }

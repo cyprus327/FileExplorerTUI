@@ -1,4 +1,4 @@
-﻿namespace Elderberry.IO;
+﻿namespace Elderberry.Managers;
 
 internal static class Navigator {
     static Navigator() {
@@ -12,8 +12,8 @@ internal static class Navigator {
     }
 
     public static bool FilesSelected { get; set; } = true;
-    public static int Selected { get; private set; } = 0;
-    public static int SidebarSelected { get; private set; } = 0;
+    public static int Selected { get; set; } = 0;
+    public static int SidebarSelected { get; set; } = 0;
 
     public static string CurrentPath { get; private set; }
 
@@ -31,10 +31,31 @@ internal static class Navigator {
         }
         return contents;
     }
+    public static FSOInfo[] GetFSOInfos() {
+        var infos = new FSOInfo[_currentContents.Count];
+        for (int i = 0; i < infos.Length; i++) {
+            string element = _currentContents.ElementAt(i);
+            
+            if (!IsFile(element)) {
+                infos[i] = new FSOInfo(Path.GetFileName(element));
+                continue;
+            }
+
+            var info = new FileInfo(element);
+            infos[i].Name = info.Name;
+            infos[i].DateModified = info.LastWriteTime.ToShortDateString();
+            long size = info.Length;
+            infos[i].Size = size < 1024 ? 
+                $"{size} B" : size < 1048576 ? 
+                $"{size / 1024.0:F2} KB" : size < 1073741824 ? 
+                $"{size / 1048576.0:F2} MB" : 
+                $"{size / 1073741824.0:F2} GB";
+        }
+        return infos;
+    }
 
     public static void SetPath(string path, bool addToCache = true) {
-        // if the file isn't a directory
-        if ((File.GetAttributes(path) & FileAttributes.Directory) != FileAttributes.Directory) return;
+        if (IsFile(path)) return;
         if (path == CurrentPath) return;
 
         Selected = 0;
@@ -135,4 +156,6 @@ internal static class Navigator {
 
         SetPath(pop, false);
     }
+
+    public static bool IsFile(string path) => (File.GetAttributes(path) & FileAttributes.Directory) != FileAttributes.Directory;
 }

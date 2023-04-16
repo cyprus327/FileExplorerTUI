@@ -1,5 +1,6 @@
-﻿using Elderberry.IO;
+﻿using System.Runtime.Serialization;
 using System.Text;
+using Elderberry.Managers;
 
 namespace Elderberry.TUI;
 
@@ -14,31 +15,45 @@ internal static class Renderer {
         "Personal Downloads"
     };
 
-    public static void FilesSelectedRender(string[] contents, int selected) {
-        StringBuilder sb = new StringBuilder();
+    public static void FilesSelectedRender(FSOInfo[] contents, int selected) {
+        var sb = new StringBuilder();
 
+        int sidebarLength = Console.WindowWidth / 4;
+        int contentsLength = (int)((Console.WindowWidth - sidebarLength - SEP) / 3);
+        string[] sidebar = Formatter.FormatVertically(_sidebarContents, Console.WindowWidth / 4);
+        
         sb.Append(Navigator.CurrentPath);
         sb.Append('\n');
-        sb.Append(new string('-', Console.WindowWidth));
+        sb.Append(new string('-', sidebarLength + SEP));
+        sb.Append("Name");
+        sb.Append(new string('-', contentsLength));
+        sb.Append("Size");
+        sb.Append(new string('-', contentsLength));
+        sb.Append("Modified");
+        sb.Append(new string('-', contentsLength - 16));
         sb.Append('\n');
 
-        string[] sidebar = Formatter.FormatVertically(_sidebarContents, 16);
+        int contentStart = selected >= sidebar.Length ? Math.Abs(selected - sidebar.Length) : 0;
         for (int i = 0; i < sidebar.Length; i++) {
             sb.Append(sidebar[i]);
             sb.Append("  | ");
             sb.Append(i == selected && i < contents.Length ? "* " : "  ");
-            if (i < contents.Length) sb.Append(contents[i]);
+            if (i + contentStart < contents.Length) {
+                sb.Append(Formatter.FormatString(contents[i + contentStart].Name, contentsLength, 4));
+                sb.Append(Formatter.FormatString(contents[i + contentStart].Size, contentsLength, 4));
+                sb.Append(contents[i + contentStart].DateModified);
+            }
             sb.Append('\n');
         }
 
         Console.Write(sb.ToString());
     }
 
-    public static void SidebarSelectedRender(string[] contents, int selected) {
-        StringBuilder sb = new StringBuilder();
+    public static void SidebarSelectedRender(FSOInfo[] contents, int selected) {
+        var sb = new StringBuilder();
 
         // new sidebar size
-        int maxLength = _sidebarContents.Max(s => s.Length);
+        int maxLength = Math.Max(_sidebarContents.Max(s => s.Length), Console.WindowWidth / 4);
 
         sb.Append(Navigator.CurrentPath);
         sb.Append('\n');
@@ -50,7 +65,7 @@ internal static class Renderer {
             sb.Append(i == selected ? " * " : "   ");
             sb.Append(sidebar[i]);
             sb.Append(" | ");
-            if (i < contents.Length) sb.Append(contents[i]);
+            if (i < contents.Length) sb.Append(contents[i].Name);
             sb.Append('\n');
         }
 
