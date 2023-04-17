@@ -18,30 +18,31 @@ internal static class Renderer {
     public static void FilesSelectedRender(FSOInfo[] contents, int selected) {
         var sb = new StringBuilder();
 
-        int sidebarLength = Console.WindowWidth / 4;
-        int contentsLength = (int)((Console.WindowWidth - sidebarLength - SEP) / 3);
-        string[] sidebar = Formatter.FormatVertically(_sidebarContents, Console.WindowWidth / 4);
+        int sidebarWidth = Console.WindowWidth / 4;
+        int contentsWidth = (int)((Console.WindowWidth - sidebarWidth - SEP) / 3);
+        string[] sidebar = Formatter.FormatVertically(_sidebarContents, sidebarWidth);
         
         sb.Append(Navigator.CurrentPath);
         sb.Append('\n');
-        sb.Append(new string('-', sidebarLength + SEP));
+        sb.Append(new string('-', sidebarWidth + SEP));
         sb.Append("Name");
-        sb.Append(new string('-', contentsLength));
+        sb.Append(new string('-', contentsWidth));
         sb.Append("Size");
-        sb.Append(new string('-', contentsLength));
+        sb.Append(new string('-', contentsWidth));
         sb.Append("Modified");
-        sb.Append(new string('-', contentsLength - 16));
+        sb.Append(new string('-', contentsWidth - 16));
         sb.Append('\n');
 
-        int contentStart = selected >= sidebar.Length ? Math.Abs(selected - sidebar.Length) : 0;
+        int offset = Math.Max(0, selected - (sidebar.Length - 1));
+        Console.Write($"{offset}\t");
         for (int i = 0; i < sidebar.Length; i++) {
             sb.Append(sidebar[i]);
             sb.Append("  | ");
             sb.Append(i == selected && i < contents.Length ? "* " : "  ");
-            if (i + contentStart < contents.Length) {
-                sb.Append(Formatter.FormatString(contents[i + contentStart].Name, contentsLength, 4));
-                sb.Append(Formatter.FormatString(contents[i + contentStart].Size, contentsLength, 4));
-                sb.Append(contents[i + contentStart].DateModified);
+            if (i + offset < contents.Length) {
+                sb.Append(Formatter.FormatString(contents[i + offset].Name, contentsWidth, 4));
+                sb.Append(Formatter.FormatString(contents[i + offset].Size, contentsWidth, 4));
+                sb.Append(Formatter.FormatString(contents[i + offset].DateModified, contentsWidth / 2));
             }
             sb.Append('\n');
         }

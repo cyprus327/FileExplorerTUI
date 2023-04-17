@@ -38,7 +38,7 @@ internal sealed class Program {
                         Navigator.Selected = found;
                         
                         Render();
-                        Console.Write(totalInput);
+                        Console.Write($"Searching for: {totalInput}");
                     }
                     Console.Clear();
                     break;
