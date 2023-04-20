@@ -14,12 +14,15 @@ internal sealed class Program {
             Render();
 
             switch (Console.ReadKey(true).Key) {
-                case ConsoleKey.W: Navigator.MoveUp(1); break;
-                case ConsoleKey.S: Navigator.MoveDown(1); break;
-                case ConsoleKey.A: Navigator.MoveBack(1); Console.Clear(); break;
-                case ConsoleKey.D: Navigator.MoveForward(); Console.Clear(); break;
-                case ConsoleKey.U: Navigator.Undo(); Console.Clear(); break;
-                case ConsoleKey.Tab: Navigator.FilesSelected = !Navigator.FilesSelected; Console.Clear(); break;
+                case ConsoleKey.W: NavManager.MoveUp(1); break;
+                case ConsoleKey.S: NavManager.MoveDown(1); break;
+
+                case ConsoleKey.A: NavManager.MoveBack(1); Console.Clear(); break;
+                case ConsoleKey.D: NavManager.MoveForward(); Console.Clear(); break;
+                
+                case ConsoleKey.U: NavManager.Undo(); Console.Clear(); break;
+                
+                case ConsoleKey.Tab: NavManager.FilesSelected = !NavManager.FilesSelected; Console.Clear(); break;
 
                 case ConsoleKey.F:
                     var totalInput = new StringBuilder();
@@ -33,9 +36,9 @@ internal sealed class Program {
                             totalInput.Append(input.KeyChar);
                         }
                         
-                        int found = FileManager.FindFile(totalInput.ToString(), Navigator.CurrentPath);
+                        int found = FileManager.FindFile(totalInput.ToString(), NavManager.CurrentPath);
                         if (found == -1) continue;
-                        Navigator.Selected = found;
+                        NavManager.Selected = found;
                         
                         Render();
                         Console.Write($"Searching for: {totalInput}");
@@ -46,13 +49,14 @@ internal sealed class Program {
         }
     }
 
-    private static void Render() {
-        Console.SetCursorPosition(0, 0);
+    private static void Render(bool setCursorPos = true) {
+        if (setCursorPos) Console.SetCursorPosition(0, 0);
 
-        if (Navigator.FilesSelected) {
-            Renderer.FilesSelectedRender(Navigator.GetFSOInfos(), Navigator.Selected);
-        } else {
-            Renderer.SidebarSelectedRender(Navigator.GetFSOInfos(), Navigator.SidebarSelected);
+        if (NavManager.FilesSelected) {
+            Renderer.FilesSelectedRender(NavManager.GetFSOInfos(), NavManager.Selected);
+        }
+        else {
+            Renderer.SidebarSelectedRender(NavManager.GetFSOInfos(), NavManager.SidebarSelected);
         }
     }
 }

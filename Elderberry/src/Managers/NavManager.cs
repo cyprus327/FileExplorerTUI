@@ -1,7 +1,10 @@
-﻿namespace Elderberry.Managers;
+﻿using Elderberry.TUI;
+using System.Diagnostics;
 
-internal static class Navigator {
-    static Navigator() {
+namespace Elderberry.Managers;
+
+internal static class NavManager {
+    static NavManager() {
         _dirCache = new Stack<string>();
 
         CurrentPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
@@ -81,6 +84,13 @@ internal static class Navigator {
     public static void MoveForward() {
         if (!FilesSelected) return;
 
+        string pathSelected = _currentContents.ElementAt(Selected);
+
+        if (IsFile(pathSelected) && pathSelected.Contains(".exe")) {
+            Process.Start(new ProcessStartInfo(pathSelected));
+            return;
+        }
+
         SetPath(_currentContents.ElementAt(Selected));
     }
 
@@ -113,7 +123,8 @@ internal static class Navigator {
                 return;
             }
 
-            Selected += amount;
+            Selected += amount; 
+
             return;
         }
 

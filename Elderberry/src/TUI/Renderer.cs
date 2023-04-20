@@ -1,5 +1,6 @@
 ﻿using System.Runtime.Serialization;
 using System.Text;
+using System.Xml.XPath;
 using Elderberry.Managers;
 
 namespace Elderberry.TUI;
@@ -22,7 +23,7 @@ internal static class Renderer {
         int contentsWidth = (int)((Console.WindowWidth - sidebarWidth - SEP) / 3);
         string[] sidebar = Formatter.FormatVertically(_sidebarContents, sidebarWidth);
         
-        sb.Append(Navigator.CurrentPath);
+        sb.Append(NavManager.CurrentPath);
         sb.Append('\n');
         sb.Append(new string('-', sidebarWidth + SEP));
         sb.Append("Name");
@@ -30,15 +31,14 @@ internal static class Renderer {
         sb.Append("Size");
         sb.Append(new string('-', contentsWidth));
         sb.Append("Modified");
-        sb.Append(new string('-', dateModifiedWidth + 3));
+        sb.Append(new string('-', Math.Max(0, contentsWidth - 16)));
         sb.Append('\n');
 
         int offset = Math.Max(0, selected - (sidebar.Length - 1));
-        Console.Write($"{offset}\t");
         for (int i = 0; i < sidebar.Length; i++) {
             sb.Append(sidebar[i]);
             sb.Append("  | ");
-            sb.Append(i == selected && i < contents.Length ? "* " : "  ");
+            sb.Append(i + offset == selected && i + offset < contents.Length ? "* " : "  ");
             if (i + offset < contents.Length) {
                 sb.Append(Formatter.FormatString(contents[i + offset].Name, contentsWidth, 4));
                 sb.Append(Formatter.FormatString(contents[i + offset].Size, contentsWidth, 4));
@@ -56,7 +56,7 @@ internal static class Renderer {
         // new sidebar size
         int maxLength = Math.Max(_sidebarContents.Max(s => s.Length), Console.WindowWidth / 4);
 
-        sb.Append(Navigator.CurrentPath);
+        sb.Append(NavManager.CurrentPath);
         sb.Append('\n');
         sb.Append(new string('-', Console.WindowWidth));
         sb.Append('\n');

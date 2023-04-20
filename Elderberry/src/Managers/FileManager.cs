@@ -2,13 +2,13 @@
 
 internal static class FileManager {
     public static int FindFile(string name, string path) {
-        if (path != Navigator.CurrentPath) {
+        if (path != NavManager.CurrentPath) {
             // TODO handle this case
             return 0;
         }
 
         int index = -1, i = 0;
-        foreach (var item in Navigator.GetCurrentContents()) {
+        foreach (var item in NavManager.GetCurrentContents()) {
             if (item.ToLower().Contains(name.ToLower())) {
                 index = i;
                 break;

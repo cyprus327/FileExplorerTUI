@@ -1,7 +1,7 @@
 ﻿namespace Elderberry.TUI;
 
 internal static class Formatter {
-    public static string[] FormatVertically(string[] arr, int maxWidth) {
+    public static string[] FormatVertically(string[] arr, int maxWidth, int additionalSpace = 0) {
         maxWidth = Math.Max(4, maxWidth);
 
         // -3 because 1 line for title 1 line for ------ and 1 line at the bottom removed
@@ -9,9 +9,7 @@ internal static class Formatter {
 
         for (int i = 0; i < output.Length; i++) {
             output[i] = i < arr.Length ?
-                arr[i].Length > maxWidth ?
-                    string.Concat(arr[i][0..(maxWidth - 3)], "...") :
-                    arr[i].PadRight(maxWidth) :
+                FormatString(arr[i], maxWidth, additionalSpace) :
                 new string(' ', maxWidth);
         }
 
