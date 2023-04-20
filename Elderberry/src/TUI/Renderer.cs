@@ -30,7 +30,7 @@ internal static class Renderer {
         sb.Append("Size");
         sb.Append(new string('-', contentsWidth));
         sb.Append("Modified");
-        sb.Append(new string('-', contentsWidth - 16));
+        sb.Append(new string('-', dateModifiedWidth + 3));
         sb.Append('\n');
 
         int offset = Math.Max(0, selected - (sidebar.Length - 1));
