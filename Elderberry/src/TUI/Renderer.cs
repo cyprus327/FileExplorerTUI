@@ -8,12 +8,12 @@ namespace Elderberry.TUI;
 internal static class Renderer {
     private const int SEP = 6; // represents the space in between the sidebar and contents
 
-    private static readonly string[] _sidebarContents = {
-        "Home",
-        "Quick Access",
-        "My Drive",
-        "Important Local Files",
-        "Personal Downloads"
+    private static readonly string[] _sidebarContentsElements = {
+        NavManager.SidebarContents[0].element,
+        NavManager.SidebarContents[1].element,
+        NavManager.SidebarContents[2].element,
+        NavManager.SidebarContents[3].element,
+        NavManager.SidebarContents[4].element
     };
 
     public static void FilesSelectedRender(FSOInfo[] contents, int selected) {
@@ -21,7 +21,7 @@ internal static class Renderer {
 
         int sidebarWidth = Console.WindowWidth / 4;
         int contentsWidth = (int)((Console.WindowWidth - sidebarWidth - SEP) / 3);
-        string[] sidebar = Formatter.FormatVertically(_sidebarContents, sidebarWidth);
+        string[] sidebar = Formatter.FormatVertically(_sidebarContentsElements, sidebarWidth);
         
         sb.Append(NavManager.CurrentPath);
         sb.Append('\n');
@@ -54,14 +54,14 @@ internal static class Renderer {
         var sb = new StringBuilder();
 
         // new sidebar size
-        int maxLength = Math.Max(_sidebarContents.Max(s => s.Length), Console.WindowWidth / 4);
+        int maxLength = Math.Max(_sidebarContentsElements.Max(s => s.Length), Console.WindowWidth / 4);
 
         sb.Append(NavManager.CurrentPath);
         sb.Append('\n');
         sb.Append(new string('-', Console.WindowWidth));
         sb.Append('\n');
 
-        string[] sidebar = Formatter.FormatVertically(_sidebarContents, maxLength);
+        string[] sidebar = Formatter.FormatVertically(_sidebarContentsElements, maxLength);
         for (int i = 0; i < sidebar.Length; i++) {
             sb.Append(i == selected ? " * " : "   ");
             sb.Append(sidebar[i]);

@@ -1,5 +1,6 @@
 ﻿using Elderberry.TUI;
 using System.Diagnostics;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Elderberry.Managers;
 
@@ -12,6 +13,14 @@ internal static class NavManager {
         files = Directory.EnumerateFiles(CurrentPath);
         _currentContents = new HashSet<string>(directories);
         _currentContents.UnionWith(files);
+
+        SidebarContents = new (string element, string path)[5] {
+            ("Quick Access", Environment.GetFolderPath(Environment.SpecialFolder.Recent)),
+            ("System", Environment.GetFolderPath(Environment.SpecialFolder.System)),
+            ("My Profile", Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)),
+            ("Programs", Environment.GetFolderPath(Environment.SpecialFolder.Programs)),
+            ("Select Drive", ""),
+        };
     }
 
     public static bool FilesSelected { get; set; } = true;
@@ -19,6 +28,8 @@ internal static class NavManager {
     public static int SidebarSelected { get; set; } = 0;
 
     public static string CurrentPath { get; private set; }
+
+    public static (string element, string path)[] SidebarContents { get; }
 
     private static IEnumerable<string> directories;
     private static IEnumerable<string> files;
@@ -82,7 +93,31 @@ internal static class NavManager {
     }
     
     public static void MoveForward() {
-        if (!FilesSelected) return;
+        if (!FilesSelected && SidebarSelected == SidebarContents.Length - 1) {
+            while (true) {
+                Console.Clear();
+                Console.WriteLine("Select Drive:\n");
+
+                DriveInfo[] drives = DriveInfo.GetDrives();
+                for (int i = 0; i < drives.Length; i++) {
+                    Console.WriteLine($"[{i}] {drives[i].Name}");
+                }
+
+                int selected = (int)Console.ReadKey(true).KeyChar - 48;
+
+                if (selected < 0 || selected > drives.Length - 1) continue;
+
+                SetPath(drives[selected].Name);
+
+                return;
+            }
+        }
+
+        if (!FilesSelected) {
+            SetPath(SidebarContents[SidebarSelected].path);
+
+            return;
+        }
 
         string pathSelected = _currentContents.ElementAt(Selected);
 
